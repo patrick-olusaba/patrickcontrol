@@ -1,0 +1,65 @@
+/* ============================================================
+   Hashtag Suggestions – Component Styles
+   ============================================================ */
+
+.hashtag-bundles-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+}
+
+@media (max-width: 900px) {
+  .hashtag-bundles-grid { grid-template-columns: 1fr; }
+}
+
+.hashtag-bundle-card {
+  transition: box-shadow 0.2s var(--ease-out), border-color 0.2s var(--ease-out);
+}
+.hashtag-bundle-card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-border-strong);
+}
+
+.bundle-tags {
+  display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px;
+}
+
+.bundle-tag { font-size: 0.79rem; padding: 5px 12px; }
+
+.copy-bundle-btn {
+  width: 100%; justify-content: center;
+}
+
+/* ── Tip card ────────────────────────────────────────────── */
+.hashtag-tip-card {
+  grid-column: span 2;
+  background: var(--color-accent-light);
+  border-color: rgba(79,110,247,0.08);
+}
+
+@media (max-width: 900px) {
+  .hashtag-tip-card { grid-column: span 1; }
+}
+
+.hashtag-tips-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.hashtag-tips-list li {
+  font-size: 0.84rem;
+  color: var(--color-ink);
+  padding-left: 22px;
+  position: relative;
+  line-height: 1.6;
+}
+
+.hashtag-tips-list li::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: var(--color-accent);
+  font-weight: 700;
+}

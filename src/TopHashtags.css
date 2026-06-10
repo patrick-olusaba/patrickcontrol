@@ -1,0 +1,171 @@
+/* ============================================================
+   Top Hashtags – Component Styles
+   ============================================================ */
+
+.top-hashtags-layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 1000px) {
+  .top-hashtags-layout { grid-template-columns: 1fr; }
+}
+
+/* ── Performance table ───────────────────────────────────── */
+.hashtag-performance-card {
+  transition: box-shadow 0.2s var(--ease-out);
+}
+.hashtag-performance-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+@media (max-width: 700px) {
+  .hashtag-performance-card .card-body {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .hashtag-table { min-width: 500px; }
+}
+
+/* ── Table ───────────────────────────────────────────────── */
+.hashtag-table {
+  display: flex;
+  flex-direction: column;
+}
+
+.hashtag-table-header {
+  display: grid;
+  grid-template-columns: 32px 1fr 90px 110px 1fr;
+  gap: 12px;
+  padding: 8px 4px 10px;
+  border-bottom: 2px solid var(--color-border);
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.hashtag-table-row {
+  display: grid;
+  grid-template-columns: 32px 1fr 90px 110px 1fr;
+  gap: 12px;
+  align-items: center;
+  padding: 14px 4px;
+  border-bottom: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  transition: background 0.15s;
+}
+.hashtag-table-row:hover {
+  background: var(--color-surface-alt);
+}
+
+.row-rank {
+  font-family: 'Syne', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--color-muted);
+  text-align: center;
+}
+/* Top 3 rank colors */
+.hashtag-table-row:nth-child(2) .row-rank { color: #D97706; }
+.hashtag-table-row:nth-child(3) .row-rank { color: #6B7280; }
+.hashtag-table-row:nth-child(4) .row-rank { color: #B45309; }
+
+.row-tag {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 0.85rem; font-weight: 600; color: var(--color-ink);
+}
+
+.tag-dot {
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.row-reach {
+  font-family: 'Syne', sans-serif;
+  font-size: 0.85rem; font-weight: 700; color: var(--color-ink);
+}
+
+.row-trend {
+  font-size: 0.76rem; font-weight: 700;
+  padding: 3px 10px; border-radius: 99px;
+}
+.trend--up    { color: #059669; background: var(--color-success-light); }
+.trend--down  { color: #DC2626; background: #FEF2F2; }
+.trend--stable { color: var(--color-muted); background: var(--color-surface-alt); }
+
+.row-bar-wrapper {
+  height: 8px;
+  background: var(--color-surface-alt);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.row-bar {
+  height: 100%; border-radius: 99px;
+  transition: width 0.7s var(--ease-out);
+}
+
+/* ── Side panel ──────────────────────────────────────────── */
+.hashtag-side-panel {
+  display: flex; flex-direction: column; gap: 14px;
+}
+
+.hashtag-side-panel .card {
+  transition: box-shadow 0.2s var(--ease-out);
+}
+.hashtag-side-panel .card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+/* ── Podium ──────────────────────────────────────────────── */
+.podium-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--color-border);
+  transition: transform 0.15s var(--ease-out);
+}
+.podium-row:last-child { border-bottom: none; }
+.podium-row:hover { transform: translateX(2px); }
+
+.podium-rank {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Syne', sans-serif;
+  font-size: 0.8rem; font-weight: 800;
+  flex-shrink: 0;
+}
+.podium-rank--1 { background: #FCD34D; color: #92400E; }
+.podium-rank--2 { background: #D1D5DB; color: #4B5563; }
+.podium-rank--3 { background: #D97706; color: #fff; }
+
+.podium-tag {
+  flex: 1;
+  font-size: 0.84rem; font-weight: 600; color: var(--color-ink);
+}
+
+.podium-reach {
+  font-family: 'Syne', sans-serif;
+  font-size: 0.84rem; font-weight: 700; color: var(--color-accent);
+}
+
+/* ── Insight card ────────────────────────────────────────── */
+.hashtag-insight-card {
+  background: var(--color-accent-light);
+  border-color: rgba(79,110,247,0.06);
+}
+
+.insight-text {
+  font-size: 0.84rem; color: var(--color-ink); line-height: 1.6;
+}
+
+.update-hint {
+  font-size: 0.68rem; color: var(--color-muted);
+}

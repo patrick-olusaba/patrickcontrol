@@ -1,0 +1,207 @@
+/* ============================================================
+   Create Post – Component Styles
+   ============================================================ */
+
+.create-post-layout {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 1100px) {
+  .create-post-layout { grid-template-columns: 1fr; }
+}
+@media (max-width: 480px) {
+  .create-post-layout { gap: 14px; }
+}
+
+/* ── Dropzone ────────────────────────────────────────────── */
+.media-dropzone {
+  border: 2px dashed var(--color-border-strong);
+  border-radius: var(--radius-md);
+  padding: 36px 24px;
+  text-align: center;
+  cursor: pointer;
+  background: var(--color-surface-alt);
+  transition: all 0.2s var(--ease-out);
+}
+.media-dropzone:hover,
+.media-dropzone:focus {
+  border-color: var(--color-accent);
+  background: var(--color-accent-light);
+  outline: none;
+}
+.dropzone-icon {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 8px;
+  transition: transform 0.2s var(--ease-out);
+}
+.media-dropzone:hover .dropzone-icon { transform: scale(1.08); }
+.media-dropzone p { font-size: 0.875rem; color: var(--color-ink); font-weight: 500; }
+.dropzone-hint { font-size: 0.75rem !important; color: var(--color-muted) !important; font-weight: 400 !important; margin-top: 4px; }
+
+/* ── Media Preview ───────────────────────────────────────── */
+.media-preview {
+  position: relative;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: #111827;
+  max-height: 260px;
+  box-shadow: var(--shadow-sm);
+}
+.media-preview-img,
+.media-preview-video {
+  width: 100%; max-height: 260px;
+  object-fit: cover; display: block;
+}
+.media-remove-btn {
+  position: absolute;
+  top: 8px; right: 8px;
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: rgba(17,24,39,0.75);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+.media-remove-btn:hover { background: #EF4444; }
+
+/* ── Char count ──────────────────────────────────────────── */
+.char-count {
+  font-size: 0.7rem;
+  color: var(--color-muted);
+  text-align: right;
+  margin-top: 4px;
+}
+
+/* ── Hashtag chips ────────────────────────────────────────── */
+.hashtag-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+/* ── Post actions ────────────────────────────────────────── */
+.post-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+@media (max-width: 480px) {
+  .post-actions { flex-direction: column; }
+  .post-actions .btn { width: 100%; }
+  .platform-toggles { gap: 6px; }
+  .platform-toggle {
+    padding: 8px 12px; font-size: 0.75rem;
+    flex: 1; justify-content: center;
+  }
+}
+
+/* ── Scheduler panel ─────────────────────────────────────── */
+.scheduler-panel {
+  margin-top: 14px;
+  padding: 16px;
+  background: var(--color-accent-light);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(79,110,247,0.12);
+  animation: fade-in 0.25s var(--ease-out);
+}
+.scheduler-panel .form-label { margin-bottom: 8px; }
+.scheduler-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.scheduler-row .form-input { flex: 1; }
+
+@media (max-width: 480px) {
+  .scheduler-row { flex-direction: column; }
+  .scheduler-row .btn { width: 100%; }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Preview Panel ───────────────────────────────────────── */
+.preview-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.preview-media {
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  margin-bottom: 12px;
+  max-height: 200px;
+  box-shadow: var(--shadow-xs);
+}
+.preview-media img, .preview-media video {
+  width: 100%; max-height: 200px;
+  object-fit: cover; display: block;
+}
+
+.preview-caption { margin-bottom: 12px; }
+.caption-text {
+  font-size: 0.85rem;
+  color: var(--color-ink);
+  white-space: pre-wrap;
+  line-height: 1.6;
+}
+.placeholder-text {
+  font-size: 0.85rem;
+  color: var(--color-muted);
+  font-style: italic;
+}
+
+.whatsapp-badge {
+  font-size: 0.7rem; font-weight: 700;
+  color: #059669;
+  background: var(--color-success-light);
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  display: inline-block;
+  margin-bottom: 8px;
+}
+
+.preview-hashtags {
+  display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px;
+}
+.preview-platforms {
+  display: flex; flex-wrap: wrap; gap: 6px;
+}
+
+.platform-preview-badge {
+  font-size: 0.71rem; font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 99px;
+  color: #fff;
+  text-transform: capitalize;
+}
+.platform-preview-badge--instagram { background: #E1306C; }
+.platform-preview-badge--tiktok    { background: #111827; }
+.platform-preview-badge--facebook  { background: #1877F2; }
+.platform-preview-badge--whatsapp  { background: #25D366; }
+
+/* ── Drafts summary ──────────────────────────────────────── */
+.drafts-summary-body {
+  display: flex; align-items: center; gap: 16px;
+}
+.drafts-icon { font-size: 1.4rem; }
+.drafts-count {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.05rem; font-weight: 700; color: var(--color-ink);
+}
+.drafts-hint { font-size: 0.73rem; color: var(--color-muted); }

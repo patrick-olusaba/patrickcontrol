@@ -1,0 +1,248 @@
+/* ============================================================
+   Dashboard – Component Styles
+   ============================================================ */
+
+/* ── Metrics Grid ────────────────────────────────────────── */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 1300px) {
+  .metrics-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 768px) {
+  .metrics-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 18px; }
+}
+@media (max-width: 480px) {
+  .metrics-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+}
+
+/* ── Metric Card ─────────────────────────────────────────── */
+.metric-card {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4) var(--space-5);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  box-shadow: var(--shadow-xs);
+  border: 1px solid var(--color-border);
+  transition: box-shadow 0.15s var(--ease-out), border-color 0.15s var(--ease-out);
+}
+
+.metric-card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-border-strong);
+}
+
+.metric-icon {
+  width: 42px; height: 42px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.metric-content { flex: 1; min-width: 0; }
+
+.metric-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 2px;
+}
+
+.metric-value {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--color-ink);
+  line-height: 1.1;
+  margin-bottom: 2px;
+  letter-spacing: -0.02em;
+}
+
+.metric-sub {
+  font-size: 0.68rem;
+  color: var(--color-muted);
+  font-weight: 500;
+}
+
+@media (max-width: 480px) {
+  .metric-card { padding: var(--space-3) var(--space-4); gap: var(--space-3); }
+  .metric-icon { width: 36px; height: 36px; font-size: 1rem; }
+  .metric-value { font-size: 1.2rem; }
+  .metric-label { font-size: 0.62rem; }
+}
+
+/* ── Lower grid ──────────────────────────────────────────── */
+.dashboard-lower {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+@media (max-width: 1300px) {
+  .dashboard-lower { grid-template-columns: 1fr 1fr; }
+  .dashboard-lower .card:last-child { grid-column: span 2; }
+}
+@media (max-width: 768px) {
+  .dashboard-lower { grid-template-columns: 1fr; gap: 12px; }
+  .dashboard-lower .card:last-child { grid-column: span 1; }
+}
+
+/* ── Recent Posts ────────────────────────────────────────── */
+.recent-posts-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.recent-post-item {
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-2);
+  border-radius: var(--radius-sm);
+  transition: background 0.12s;
+}
+.recent-post-item:hover { background: var(--color-surface-alt); }
+
+.post-item-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 4px;
+  background: var(--color-accent);
+}
+
+.post-item-info { flex: 1; min-width: 0; }
+
+.post-item-caption {
+  font-size: 0.79rem;
+  font-weight: 500;
+  color: var(--color-ink);
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.post-item-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.post-item-date { font-size: 0.7rem; color: var(--color-muted); }
+
+.post-item-platforms { display: flex; gap: 3px; }
+
+.platform-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.platform-dot--instagram { background: #E1306C; }
+.platform-dot--tiktok    { background: #111827; }
+.platform-dot--facebook  { background: #1877F2; }
+.platform-dot--whatsapp  { background: #25D366; }
+
+/* ── Pending List ────────────────────────────────────────── */
+.pending-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.pending-item {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+  transition: background 0.15s;
+}
+.pending-item:hover { background: var(--color-surface); border-color: var(--color-border-strong); }
+
+.pending-caption {
+  font-size: 0.78rem; color: var(--color-ink);
+  margin: var(--space-2) 0 var(--space-3);
+}
+
+.pending-actions { display: flex; gap: var(--space-2); }
+.pending-actions .btn-sm { padding: 5px 10px; font-size: 0.73rem; }
+
+/* ── Quick Stats (Platform Reach) ────────────────────────── */
+.quick-stats-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.quick-stat-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.quick-stat-icon { font-size: 0.95rem; width: 24px; text-align: center; }
+.quick-stat-platform {
+  font-size: 0.78rem; font-weight: 600; color: var(--color-ink);
+  width: 75px; flex-shrink: 0;
+}
+
+.quick-stat-bar-wrapper {
+  flex: 1; height: 7px;
+  background: var(--color-surface-alt);
+  border-radius: 99px; overflow: hidden;
+}
+
+.quick-stat-bar {
+  height: 100%; border-radius: 99px;
+  transition: width 0.6s var(--ease-out);
+  max-width: 100%;
+}
+
+.quick-stat-reach {
+  font-size: 0.78rem; font-weight: 700; color: var(--color-ink);
+  width: 42px; text-align: right; flex-shrink: 0;
+}
+
+@media (max-width: 480px) {
+  .quick-stat-platform { width: 60px; font-size: 0.7rem; }
+  .quick-stat-reach { width: 34px; font-size: 0.68rem; }
+}
+
+/* ── Loading skeletons ───────────────────────────────────── */
+.loading-shell .skeleton-metrics {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+}
+.loading-shell .skeleton-lower {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 1300px) {
+  .loading-shell .skeleton-metrics { grid-template-columns: repeat(3, 1fr); }
+  .loading-shell .skeleton-lower { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 768px) {
+  .loading-shell .skeleton-lower { grid-template-columns: 1fr; }
+}
+@media (max-width: 480px) {
+  .loading-shell .skeleton-metrics { grid-template-columns: repeat(2, 1fr); }
+  .loading-shell { padding: var(--space-3); gap: var(--space-3); }
+}
