@@ -1,0 +1,54 @@
+.settings-layout { display: flex; flex-direction: column; gap: 18px; max-width: 680px; }
+
+.settings-profile-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+.settings-avatar {
+  width: 60px; height: 60px; border-radius: 50%;
+  background: var(--gradient-accent); display: flex; align-items: center; justify-content: center;
+  font-size: 1.4rem; font-weight: 800; color: #fff; flex-shrink: 0;
+}
+.settings-avatar img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+.settings-profile-name { font-size: 1rem; font-weight: 700; color: var(--color-ink); }
+.settings-link-btn {
+  font-size: 0.78rem; font-weight: 600; color: var(--color-accent); background: none; border: none;
+  cursor: pointer; padding: 0; margin-top: 2px;
+}
+.settings-link-btn:hover { text-decoration: underline; }
+
+.settings-accounts-list { display: flex; flex-direction: column; gap: 4px; }
+.settings-account-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 14px; background: var(--color-surface-alt); border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+}
+.settings-account-info { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.settings-account-platform { font-size: 0.84rem; font-weight: 600; color: var(--color-ink); text-transform: capitalize; }
+.settings-account-handle { font-size: 0.78rem; color: var(--color-muted); }
+.settings-account-followers { font-size: 0.7rem; color: var(--color-muted); background: var(--color-surface); padding: 2px 8px; border-radius: 99px; }
+.settings-account-status {
+  font-size: 0.74rem; font-weight: 600; color: var(--color-muted);
+  padding: 4px 12px; border-radius: 99px; border: 1px solid var(--color-border); white-space: nowrap;
+}
+.settings-account-status.connected { color: #16A34A; background: var(--color-success-light); border-color: rgba(34,197,94,0.2); }
+
+.settings-toggles { display: flex; flex-direction: column; gap: 4px; }
+.settings-toggle-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 14px; gap: 16px;
+}
+.settings-toggle-label { font-size: 0.85rem; font-weight: 600; color: var(--color-ink); }
+.settings-toggle-desc { font-size: 0.74rem; color: var(--color-muted); margin-top: 2px; }
+
+.settings-switch { position: relative; display: inline-block; cursor: pointer; }
+.settings-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+.settings-switch-track {
+  display: block; width: 44px; height: 26px;
+  background: #CBD5E1; border-radius: 99px;
+  transition: background 0.2s; position: relative;
+}
+.settings-switch-track::after {
+  content: ''; position: absolute; top: 3px; left: 3px;
+  width: 20px; height: 20px; background: #fff; border-radius: 50%;
+  transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+.settings-switch input:checked + .settings-switch-track { background: var(--color-accent); }
+.settings-switch input:checked + .settings-switch-track::after { transform: translateX(18px); }

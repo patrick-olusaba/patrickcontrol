@@ -7,27 +7,20 @@
 import React, { useMemo, useState } from 'react';
 import { useAppContext } from './AppContext';
 import type { Post } from './types';
+import { PlatformIcon } from './platforms';
 import './ContentCalendar.css';
 
 // ── Helpers ────────────────────────────────────────────────
-/** Returns the Monday of the week containing `date` */
 function getWeekStart(date: Date): Date {
   const d = new Date(date);
-  const day = d.getDay(); // 0=Sun
-  const diff = day === 0 ? -6 : 1 - day; // shift to Monday
+  const day = d.getDay();
+  const diff = day === 0 ? -6 : 1 - day;
   d.setDate(d.getDate() + diff);
   d.setHours(0, 0, 0, 0);
   return d;
 }
 
 const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-
-const PLATFORM_ICONS: Record<string, string> = {
-  instagram: '📸',
-  tiktok:    '🎵',
-  facebook:  '👥',
-  whatsapp:  '💚',
-};
 
 // ── Post Card inside calendar cell ────────────────────────
 interface CalendarPostCardProps {
@@ -63,19 +56,28 @@ const CalendarPostCard: React.FC<CalendarPostCardProps> = ({
       aria-expanded={expanded}
       onKeyDown={(e) => e.key === 'Enter' && setExpanded((v) => !v)}
     >
+      {/* Tiny thumbnail if post has an image */}
+      {post.mediaUrl && (
+        <div className="cal-post-thumb">
+          <img src={post.mediaUrl} alt="" aria-hidden="true" />
+        </div>
+      )}
       <div className="cal-post-time">{time}</div>
       <div className="cal-post-caption">
         {post.caption.slice(0, 45)}{post.caption.length > 45 ? '…' : ''}
       </div>
       <div className="cal-post-platforms">
         {post.platforms.map((pl) => (
-          <span key={pl} title={pl}>{PLATFORM_ICONS[pl]}</span>
+          <span key={pl} title={pl}><PlatformIcon platform={pl} size={14} /></span>
         ))}
       </div>
 
       {/* Expanded detail */}
       {expanded && (
         <div className="cal-post-expanded" onClick={(e) => e.stopPropagation()}>
+          {post.mediaUrl && (
+            <img src={post.mediaUrl} alt="Post media" className="cal-post-expanded-img" />
+          )}
           <p className="cal-post-full-caption">{post.caption}</p>
           <div className="cal-post-hashtags">
             {post.hashtags.map((h) => (
@@ -258,10 +260,15 @@ const ContentCalendar: React.FC = () => {
                 <div className="drafts-bar-posts">
                   {state.posts
                     .filter((p) => p.status === 'draft')
-                    .slice(0, 3)
+                    .slice(0, 4)
                     .map((post) => (
-                      <div key={post.id} className="draft-chip">
-                        {post.caption.slice(0, 30)}…
+                      <div key={post.id} className="draft-thumb-chip">
+                        {post.mediaUrl && (
+                          <img src={post.mediaUrl} alt="" className="draft-thumb-chip-img" />
+                        )}
+                        <span className="draft-thumb-chip-label">
+                          {post.caption.slice(0, 24)}{post.caption.length > 24 ? '…' : ''}
+                        </span>
                       </div>
                     ))}
                 </div>

@@ -91,18 +91,20 @@
 }
 
 .row-trend {
-  font-size: 0.76rem; font-weight: 700;
-  padding: 3px 10px; border-radius: 99px;
+  font-size: 0.74rem; font-weight: 700;
+  padding: 4px 10px; border-radius: 99px;
+  letter-spacing: 0.02em;
 }
-.trend--up    { color: #059669; background: var(--color-success-light); }
-.trend--down  { color: #DC2626; background: #FEF2F2; }
-.trend--stable { color: var(--color-muted); background: var(--color-surface-alt); }
+.trend--up    { color: #059669; background: var(--color-success-light); border: 1px solid rgba(16,185,129,0.15); }
+.trend--down  { color: #DC2626; background: #FEF2F2; border: 1px solid rgba(220,38,38,0.12); }
+.trend--stable { color: var(--color-muted); background: var(--color-surface-alt); border: 1px solid var(--color-border); }
 
 .row-bar-wrapper {
   height: 8px;
   background: var(--color-surface-alt);
   border-radius: 99px;
   overflow: hidden;
+  border: 1px solid var(--color-border);
 }
 
 .row-bar {
@@ -127,13 +129,17 @@
   display: flex; align-items: center; gap: 12px;
   padding: 10px 0;
   border-bottom: 1px solid var(--color-border);
-  transition: transform 0.15s var(--ease-out);
+  transition: all 0.15s var(--ease-out);
+  border-radius: var(--radius-sm);
 }
 .podium-row:last-child { border-bottom: none; }
-.podium-row:hover { transform: translateX(2px); }
+.podium-row:hover {
+  transform: translateX(4px);
+  padding-left: 4px;
+}
 
 .podium-rank {
-  width: 28px; height: 28px;
+  width: 30px; height: 30px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -141,10 +147,11 @@
   font-family: 'Syne', sans-serif;
   font-size: 0.8rem; font-weight: 800;
   flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
 }
-.podium-rank--1 { background: #FCD34D; color: #92400E; }
-.podium-rank--2 { background: #D1D5DB; color: #4B5563; }
-.podium-rank--3 { background: #D97706; color: #fff; }
+.podium-rank--1 { background: linear-gradient(135deg, #FCD34D, #F59E0B); color: #78350F; }
+.podium-rank--2 { background: linear-gradient(135deg, #E5E7EB, #D1D5DB); color: #374151; }
+.podium-rank--3 { background: linear-gradient(135deg, #D97706, #B45309); color: #fff; }
 
 .podium-tag {
   flex: 1;

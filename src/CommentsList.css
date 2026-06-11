@@ -25,7 +25,7 @@
 
 .filter-tab {
   flex-shrink: 0;
-  padding: 7px 16px;
+  padding: 7px 18px;
   border-radius: 99px;
   font-size: 0.79rem;
   font-weight: 600;
@@ -34,15 +34,20 @@
   background: var(--color-surface);
   color: var(--color-muted);
   transition: all 0.15s var(--ease-out);
+  box-shadow: var(--shadow-xs);
+  letter-spacing: 0.01em;
 }
 .filter-tab:hover {
   border-color: var(--color-accent);
   color: var(--color-accent);
+  background: var(--color-accent-light);
+  transform: translateY(-1px);
 }
 .filter-tab--active {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
+  background: var(--gradient-accent);
+  border-color: transparent;
   color: #fff;
+  box-shadow: 0 2px 8px rgba(79,110,247,0.3);
 }
 
 /* ── Comments card ───────────────────────────────────────── */
@@ -56,11 +61,14 @@
   gap: 14px;
   padding: 16px 20px;
   border-bottom: 1px solid var(--color-border);
-  border-left: 3px solid var(--color-accent);
-  transition: background 0.15s;
+  border-left: 3px solid transparent;
+  transition: all 0.15s var(--ease-out);
 }
 .comment-row:last-child { border-bottom: none; }
-.comment-row:hover { background: var(--color-surface-alt); }
+.comment-row:hover {
+  background: var(--color-surface-alt);
+  border-left-color: var(--color-accent);
+}
 
 /* ── Avatar ──────────────────────────────────────────────── */
 .comment-avatar {

@@ -6,14 +6,11 @@
 import React, { useState } from 'react';
 import { useAppContext } from './AppContext';
 import type { Comment } from './types';
+import { PlatformIcon } from './platforms';
 import './CommentsList.css';
 
-// ── Platform icon map ──────────────────────────────────────
-const PLATFORM_ICONS: Record<string, string> = {
-  instagram: '📸 Instagram',
-  tiktok:    '🎵 TikTok',
-  facebook:  '👥 Facebook',
-  whatsapp:  '💚 WhatsApp',
+const PLATFORM_LABELS: Record<string, string> = {
+  instagram: 'Instagram', tiktok: 'TikTok', facebook: 'Facebook', whatsapp: 'WhatsApp',
 };
 
 // ── Time formatter ─────────────────────────────────────────
@@ -89,7 +86,7 @@ const CommentRow: React.FC<CommentRowProps> = ({ comment, onReply }) => {
         <div className="comment-header">
           <div className="comment-author-meta">
             <span className="comment-author">{comment.author}</span>
-            <span className="comment-platform">{PLATFORM_ICONS[comment.platform]}</span>
+            <span className="comment-platform"><PlatformIcon platform={comment.platform} size={12} /> {PLATFORM_LABELS[comment.platform]}</span>
           </div>
           <span className="comment-time">{timeAgo(comment.createdAt)}</span>
         </div>

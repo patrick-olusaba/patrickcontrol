@@ -1,10 +1,16 @@
 // ============================================================
-// PatrickControl – Dashboard
-// Clean metric cards row + content sections below
+// Social Media Hub – Dashboard
+// Matches reference: metric cards, mini create-post form,
+// inline calendar strip, latest comments, top hashtags
 // ============================================================
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useRef, useCallback, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAppContext } from './AppContext';
+import type { Platform, Post, PublishedPost } from './types';
+import { fetchPublishedPosts } from './services/mockData';
+import { LineChart, Line, BarChart, Bar, XAxis, ResponsiveContainer, Tooltip } from 'recharts';
+import { PLATFORMS, PlatformIcon } from './platforms';
 import './Dashboard.css';
 
 // ── Metric Card ────────────────────────────────────────────
@@ -12,120 +18,435 @@ interface MetricCardProps {
   label: string;
   value: string | number;
   icon: string;
-  accent?: 'blue' | 'green' | 'amber' | 'purple' | 'indigo';
-  sub?: string;
+  iconBg: string;
+  iconColor: string;
 }
 
-const ACCENT_COLORS: Record<string, { bar: string; bg: string; text: string }> = {
-  blue:   { bar: '#3B82F6', bg: '#EFF6FF', text: '#1D4ED8' },
-  green:  { bar: '#10B981', bg: '#ECFDF5', text: '#059669' },
-  amber:  { bar: '#F59E0B', bg: '#FFFBEB', text: '#B45309' },
-  purple: { bar: '#8B5CF6', bg: '#F5F3FF', text: '#6D28D9' },
-  indigo: { bar: '#4F6EF7', bg: '#EEF1FE', text: '#3B54D4' },
-};
+const MetricCard: React.FC<MetricCardProps> = ({ label, value, icon, iconBg, iconColor }) => (
+  <div className="metric-card">
+    <div className="metric-icon-box" style={{ background: iconBg }}>
+      <span style={{ color: iconColor, fontSize: '1.1rem' }}>{icon}</span>
+    </div>
+    <div className="metric-info">
+      <p className="metric-label">{label}</p>
+      <p className="metric-value">{value}</p>
+    </div>
+  </div>
+);
 
-const MetricCard: React.FC<MetricCardProps> = ({ label, value, icon, accent = 'blue', sub }) => {
-  const c = ACCENT_COLORS[accent] ?? ACCENT_COLORS.blue;
+// ── Mini Sparkline (real chart) ────────────────────────────
+const sparkData = [
+  { day: 'M', reach: 8.2, engagement: 4.1 },
+  { day: 'T', reach: 9.5, engagement: 4.8 },
+  { day: 'W', reach: 7.8, engagement: 3.9 },
+  { day: 'T', reach: 11.2, engagement: 5.6 },
+  { day: 'F', reach: 10.1, engagement: 5.0 },
+  { day: 'S', reach: 12.4, engagement: 6.2 },
+  { day: 'S', reach: 11.8, engagement: 5.9 },
+];
+
+const Sparkline: React.FC = () => (
+  <div className="metric-card metric-card--chart">
+    <ResponsiveContainer width="100%" height={48}>
+      <LineChart data={sparkData}>
+        <Line type="monotone" dataKey="reach" stroke="#F59E0B" strokeWidth={2} dot={false} />
+        <Line type="monotone" dataKey="engagement" stroke="#10B981" strokeWidth={2} dot={false} />
+      </LineChart>
+    </ResponsiveContainer>
+  </div>
+);
+
+// ── Calendar day helpers ───────────────────────────────────
+const DAY_NAMES = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+function getWeekDays(): Date[] {
+  const now = new Date();
+  const day = now.getDay();
+  const diff = day === 0 ? -6 : 1 - day;
+  const mon = new Date(now);
+  mon.setDate(now.getDate() + diff);
+  mon.setHours(0, 0, 0, 0);
+  return Array.from({ length: 6 }, (_, i) => {
+    const d = new Date(mon);
+    d.setDate(mon.getDate() + i);
+    return d;
+  });
+}
+
+const CAL_COLORS = [
+  { bg: '#EDE9FE', text: '#5B21B6', dot: '#7C3AED' },
+  { bg: '#FCE7F3', text: '#9D174D', dot: '#EC4899' },
+  { bg: '#FEF3C7', text: '#92400E', dot: '#D97706' },
+  { bg: '#DBEAFE', text: '#1E40AF', dot: '#3B82F6' },
+  { bg: '#D1FAE5', text: '#065F46', dot: '#10B981' },
+];
+
+// ── Mini Create Post Form ──────────────────────────────────
+let postCounter = 200;
+const nextId = () => `post_${++postCounter}_${Date.now()}`;
+
+const MiniCreatePost: React.FC = () => {
+  const { addPost, showToast } = useAppContext();
+  const navigate = useNavigate();
+  const [caption, setCaption] = useState('');
+  const [platforms, setPlatforms] = useState<Platform[]>(['instagram']);
+  const [mediaPreview, setMediaPreview] = useState<string | null>(null);
+  const [scheduledAt, setScheduledAt] = useState('');
+  const [showScheduler, setShowScheduler] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const togglePlatform = (pl: Platform) =>
+    setPlatforms((prev) => prev.includes(pl) ? prev.filter((p) => p !== pl) : [...prev, pl]);
+
+  const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setMediaPreview(URL.createObjectURL(file));
+  }, []);
+
+  const buildPost = (status: Post['status'], schedule?: string): Post => ({
+    id: nextId(),
+    caption,
+    platforms,
+    status,
+    scheduledAt: schedule,
+    hashtags: [],
+    mediaUrl: mediaPreview ?? undefined,
+    mediaType: 'image',
+    createdAt: new Date().toISOString(),
+  });
+
+  const reset = () => {
+    setCaption(''); setPlatforms(['instagram']);
+    setMediaPreview(null); setScheduledAt('');
+    setShowScheduler(false);
+    if (fileRef.current) fileRef.current.value = '';
+  };
+
+  const handleSchedule = () => {
+    if (!scheduledAt) { showToast('Pick a date and time first.'); return; }
+    addPost(buildPost('scheduled', new Date(scheduledAt).toISOString()));
+    showToast(`📅 Scheduled for ${new Date(scheduledAt).toLocaleString('en-GB')}`);
+    reset();
+  };
+
+  const handlePostNow = () => {
+    if (!caption.trim() && !mediaPreview) { showToast('Add a caption or media first.'); return; }
+    addPost(buildPost('published'));
+    showToast('🎉 Posted now!');
+    reset();
+  };
+
+  const handleSaveDraft = () => {
+    if (!caption.trim() && !mediaPreview) { showToast('Nothing to save.'); return; }
+    addPost(buildPost('draft'));
+    showToast('💾 Saved as draft.');
+    reset();
+  };
+
   return (
-    <div className="metric-card" style={{ borderTop: `3px solid ${c.bar}` }}>
-      <div className="metric-icon" style={{ background: c.bg, color: c.text }}>{icon}</div>
-      <div className="metric-content">
-        <p className="metric-label">{label}</p>
-        <p className="metric-value">{value}</p>
-        {sub && <p className="metric-sub">{sub}</p>}
+    <div className="mini-create-card card">
+      <div className="card-header">
+        <h3>Create New Post</h3>
+      </div>
+      <div className="card-body mini-create-body">
+        {/* Upload Media button */}
+        <button
+          className="mini-upload-btn"
+          onClick={() => fileRef.current?.click()}
+          aria-label="Upload media"
+        >
+          <span>📷</span> Upload Media
+        </button>
+        <input
+          ref={fileRef}
+          type="file"
+          accept="image/*,video/*"
+          onChange={handleFileChange}
+          style={{ display: 'none' }}
+        />
+
+        {/* Media + caption row */}
+        <div className="mini-compose-row">
+          {mediaPreview && (
+            <div className="mini-media-thumb">
+              <img src={mediaPreview} alt="Media preview" />
+              <button className="mini-media-remove" onClick={() => setMediaPreview(null)}>✕</button>
+            </div>
+          )}
+          <textarea
+            className="form-textarea mini-caption"
+            value={caption}
+            onChange={(e) => setCaption(e.target.value)}
+            placeholder="Write your caption…"
+            rows={3}
+          />
+        </div>
+
+        {/* Platform toggles */}
+        <div className="mini-platform-row">
+          {PLATFORMS.map(({ key, label }) => (
+            <button
+              key={key}
+              type="button"
+              className={`mini-platform-btn ${key} ${platforms.includes(key) ? 'active' : ''}`}
+              onClick={() => togglePlatform(key)}
+              aria-pressed={platforms.includes(key)}
+            >
+              <span className="mini-platform-icon"><PlatformIcon platform={key} /></span>
+              <span>{label}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* Actions */}
+        <div className="mini-actions">
+          <button className="btn btn-primary mini-action-btn" onClick={() => setShowScheduler(v => !v)}>
+            Schedule Post
+          </button>
+          <button className="btn btn-secondary mini-action-btn" onClick={handlePostNow}>
+            Post Now
+          </button>
+          <div className="mini-secondary-actions">
+            <button className="mini-link-btn" onClick={handleSaveDraft}>
+              › Save as Draft
+            </button>
+            <button className="mini-link-btn" onClick={() => navigate('/hashtags')}>
+              › Hashtag Suggestions
+            </button>
+          </div>
+        </div>
+
+        {/* Inline scheduler */}
+        {showScheduler && (
+          <div className="mini-scheduler">
+            <input
+              type="datetime-local"
+              className="form-input"
+              value={scheduledAt}
+              onChange={(e) => setScheduledAt(e.target.value)}
+              min={new Date().toISOString().slice(0, 16)}
+            />
+            <button className="btn btn-primary btn-sm" onClick={handleSchedule}>Confirm</button>
+          </div>
+        )}
       </div>
     </div>
   );
 };
 
-// ── Upcoming Posts ─────────────────────────────────────────
-const UpcomingPosts: React.FC = () => {
+// ── Mini Calendar Strip ────────────────────────────────────
+const MiniCalendar: React.FC = () => {
   const { state } = useAppContext();
-  const recent = useMemo(
-    () => state.posts.filter((p) => p.status === 'scheduled').slice(0, 4),
-    [state.posts]
-  );
+  const navigate = useNavigate();
+  const weekDays = useMemo(() => getWeekDays(), []);
 
-  if (!recent.length) return <div className="empty-state"><p>No upcoming posts.</p></div>;
+  const today = new Date();
+  const isToday = (d: Date) =>
+    d.getDate() === today.getDate() &&
+    d.getMonth() === today.getMonth() &&
+    d.getFullYear() === today.getFullYear();
+
+  // Group scheduled posts by day
+  const postsByDay: Record<number, Post[]> = useMemo(() => {
+    const result: Record<number, Post[]> = {};
+    for (let i = 0; i < 6; i++) result[i] = [];
+    state.posts
+      .filter((p) => p.status === 'scheduled' && p.scheduledAt)
+      .forEach((post) => {
+        const d = new Date(post.scheduledAt!);
+        const idx = weekDays.findIndex(
+          (wd) =>
+            wd.getFullYear() === d.getFullYear() &&
+            wd.getMonth() === d.getMonth() &&
+            wd.getDate() === d.getDate()
+        );
+        if (idx !== -1) result[idx].push(post);
+      });
+    return result;
+  }, [state.posts, weekDays]);
 
   return (
-    <ul className="recent-posts-list">
-      {recent.map((post) => {
-        const dt = post.scheduledAt ? new Date(post.scheduledAt) : null;
-        const dateStr = dt
-          ? dt.toLocaleDateString('en-GB', { weekday: 'short', month: 'short', day: 'numeric' })
-          : '—';
-        const timeStr = dt
-          ? dt.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
-          : '';
-
-        return (
-          <li key={post.id} className="recent-post-item">
-            <div className="post-item-dot" />
-            <div className="post-item-info">
-              <p className="post-item-caption">
-                {post.caption.slice(0, 55)}{post.caption.length > 55 ? '…' : ''}
-              </p>
-              <div className="post-item-meta">
-                <span className="post-item-date">{dateStr} · {timeStr}</span>
-                <div className="post-item-platforms">
-                  {post.platforms.map((pl) => (
-                    <span key={pl} className={`platform-dot platform-dot--${pl}`} title={pl} />
-                  ))}
+    <div className="mini-calendar-card card">
+      <div className="card-header">
+        <h3>Content Calendar</h3>
+        <button className="cal-view-btn" onClick={() => navigate('/calendar')}>
+          View Month ▾
+        </button>
+      </div>
+      <div className="card-body mini-cal-body">
+        <div className="mini-cal-grid">
+          {weekDays.map((day, idx) => {
+            const posts = postsByDay[idx] ?? [];
+            const dayName = DAY_NAMES[idx];
+            const dayNum = day.getDate();
+            return (
+              <div key={idx} className={`mini-cal-col ${isToday(day) ? 'mini-cal-col--today' : ''}`}>
+                <div className="mini-cal-header">
+                  <span className="mini-cal-day-name">{dayName}</span>
+                  <span className={`mini-cal-day-num ${isToday(day) ? 'today-dot' : ''}`}>{dayNum}</span>
+                </div>
+                <div className="mini-cal-posts">
+                  {posts.slice(0, 3).map((post, pi) => {
+                    const c = CAL_COLORS[pi % CAL_COLORS.length];
+                    const label = post.caption.slice(0, 14) || 'Post';
+                    return (
+                      <div
+                        key={post.id}
+                        className="mini-cal-chip"
+                        style={{ background: c.bg, color: c.text }}
+                        title={post.caption}
+                      >
+                        {post.mediaUrl ? (
+                          <img src={post.mediaUrl} alt="" className="mini-cal-chip-img" />
+                        ) : (
+                          <span className="mini-cal-chip-dot" style={{ background: c.dot }} />
+                        )}
+                        {label}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
-            </div>
-          </li>
-        );
-      })}
-    </ul>
+            );
+          })}
+        </div>
+      </div>
+    </div>
   );
 };
 
-// ── Pending Approvals ──────────────────────────────────────
-const PendingApprovals: React.FC = () => {
-  const { state } = useAppContext();
-  const drafts = state.posts.filter((p) => p.status === 'draft').slice(0, 3);
+// ── Latest Comments Panel ──────────────────────────────────
 
-  if (!drafts.length) return <div className="empty-state"><p>No drafts waiting.</p></div>;
+const AVATAR_COLORS = ['#8B5CF6', '#3B82F6', '#EC4899', '#F59E0B', '#10B981', '#EF4444'];
+
+const LatestComments: React.FC = () => {
+  const { state } = useAppContext();
+  const navigate = useNavigate();
+  const recent = state.comments.slice(0, 4);
 
   return (
-    <ul className="pending-list">
-      {drafts.map((post) => (
-        <li key={post.id} className="pending-item">
-          <span className="badge badge-draft">Draft</span>
-          <p className="pending-caption">{post.caption.slice(0, 55)}…</p>
-          <div className="pending-actions">
-            <button className="btn btn-sm btn-primary">Approve</button>
-            <button className="btn btn-sm btn-secondary">Edit</button>
-          </div>
-        </li>
-      ))}
-    </ul>
+    <div className="latest-comments-card card">
+      <div className="card-header">
+        <h3>Latest Comments</h3>
+      </div>
+      <div className="card-body lc-body">
+        {recent.map((c) => {
+          const initials = c.author.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase();
+          const colorIdx = c.author.split('').reduce((a, ch) => a + ch.charCodeAt(0), 0) % AVATAR_COLORS.length;
+          return (
+            <div key={c.id} className="lc-row">
+              <div className="lc-avatar" style={{ background: AVATAR_COLORS[colorIdx] }}>{initials}</div>
+              <div className="lc-content">
+                <p className="lc-text">{c.text}</p>
+              </div>
+              {!c.replied && (
+                <button
+                  className="lc-reply-btn"
+                  onClick={() => navigate('/comments')}
+                  aria-label="Reply"
+                >
+                  ▾
+                </button>
+              )}
+            </div>
+          );
+        })}
+        {recent.length === 0 && (
+          <div className="empty-state"><p>No comments yet.</p></div>
+        )}
+      </div>
+    </div>
   );
 };
 
-// ── Platform Reach ─────────────────────────────────────────
-const PlatformReach: React.FC = () => {
-  const platforms = [
-    { name: 'Instagram', icon: '📸', pct: 58, reach: '18.2K', color: '#E1306C' },
-    { name: 'TikTok',    icon: '🎵', pct: 27, reach: '8.5K',  color: '#111827' },
-    { name: 'Facebook',  icon: '👥', pct: 12, reach: '4.1K',  color: '#1877F2' },
-    { name: 'WhatsApp',  icon: '💚', pct: 3,  reach: '0.9K',  color: '#25D366' },
+// ── Top Hashtags Panel ─────────────────────────────────────
+const TopHashtagsPanel: React.FC = () => {
+  const { state } = useAppContext();
+  const navigate = useNavigate();
+  const top = state.hashtags.slice(0, 4);
+
+  return (
+    <div className="top-hashtags-panel card">
+      <div className="card-header">
+        <h3>Top Hashtags</h3>
+      </div>
+      <div className="card-body th-body">
+        {top.map((h) => (
+          <button
+            key={h.tag}
+            className="th-item"
+            onClick={() => navigate('/top-tags')}
+          >
+            <span className="th-hash">#</span>
+            <span className="th-tag">{h.tag.replace('#', '')}</span>
+          </button>
+        ))}
+        {top.length === 0 && (
+          <div className="empty-state"><p>No hashtags yet.</p></div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// ── Analytics Mini-Section ─────────────────────────────────
+function formatK(n: number): string {
+  if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
+  if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
+  return n.toString();
+}
+
+const AnalyticsSection: React.FC = () => {
+  const [pubPosts, setPubPosts] = useState<PublishedPost[]>([]);
+
+  useEffect(() => {
+    fetchPublishedPosts().then(setPubPosts);
+  }, []);
+
+  const totalLikes = pubPosts.reduce((s, p) => s + p.stats.likes, 0);
+  const totalComments = pubPosts.reduce((s, p) => s + p.stats.comments, 0);
+  const totalShares = pubPosts.reduce((s, p) => s + p.stats.shares, 0);
+  const totalReach = pubPosts.reduce((s, p) => s + p.stats.reach, 0);
+
+  const stats = [
+    { value: formatK(totalLikes),    label: 'Total Likes' },
+    { value: formatK(totalComments), label: 'Comments' },
+    { value: formatK(totalShares),   label: 'Shares' },
+    { value: formatK(totalReach),    label: 'Post Reach' },
   ];
 
   return (
-    <div className="quick-stats-list">
-      {platforms.map((pl) => (
-        <div className="quick-stat-row" key={pl.name}>
-          <span className="quick-stat-icon">{pl.icon}</span>
-          <span className="quick-stat-platform">{pl.name}</span>
-          <div className="quick-stat-bar-wrapper">
-            <div className="quick-stat-bar" style={{ width: `${pl.pct}%`, background: pl.color }} />
-          </div>
-          <span className="quick-stat-reach">{pl.reach}</span>
+    <div className="analytics-card card">
+      <div className="card-header">
+        <h3>Analytics</h3>
+        <span className="analytics-range">✓ Last 7 Days ▾</span>
+      </div>
+      <div className="card-body analytics-body">
+        <div className="analytics-stats">
+          {stats.map((s) => (
+            <div key={s.label} className="analytics-stat">
+              <p className="analytics-stat-value">{s.value}</p>
+              <p className="analytics-stat-label">{s.label}</p>
+            </div>
+          ))}
         </div>
-      ))}
+        {/* Real bar chart */}
+        <div className="analytics-chart">
+          <p className="analytics-chart-title">Performance Insights</p>
+          <ResponsiveContainer width="100%" height={100}>
+            <BarChart data={[
+              { day: 'Mon', reach: 30 }, { day: 'Tue', reach: 45 }, { day: 'Wed', reach: 38 },
+              { day: 'Thu', reach: 55 }, { day: 'Fri', reach: 48 }, { day: 'Sat', reach: 62 }, { day: 'Sun', reach: 70 },
+            ]}>
+              <XAxis dataKey="day" tick={{ fontSize: 10 }} axisLine={false} tickLine={false} />
+              <Tooltip />
+              <Bar dataKey="reach" fill="var(--color-accent)" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+          <p className="bar-chart-label">Reach</p>
+        </div>
+      </div>
     </div>
   );
 };
@@ -134,40 +455,24 @@ const PlatformReach: React.FC = () => {
 const Dashboard: React.FC = () => {
   const { state } = useAppContext();
 
-  const metrics = useMemo(() => {
-    const scheduled = state.posts.filter((p) => p.status === 'scheduled').length;
-    const drafts    = state.posts.filter((p) => p.status === 'draft').length;
-    return { scheduled, drafts };
-  }, [state.posts]);
-
-  const now = new Date().toLocaleDateString('en-GB', {
-    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
-  });
+  const metrics = useMemo(() => ({
+    scheduled: state.posts.filter((p) => p.status === 'scheduled').length || 12,
+    drafts:    state.posts.filter((p) => p.status === 'draft').length || 7,
+    comments:  state.comments.length || 89,
+  }), [state.posts, state.comments]);
 
   if (state.loading) {
     return (
-      <>
-        <div className="page-header">
-          <div>
-            <div className="skeleton skeleton-title" style={{ height: 22 }} />
-            <div className="skeleton skeleton-text" style={{ width: 160, marginTop: 6 }} />
+      <div className="page-body">
+        <div className="loading-shell">
+          <div className="skeleton-metrics">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="skeleton skeleton-metric" />
+            ))}
           </div>
+          <div className="skeleton skeleton-card" style={{ height: 220, marginTop: 16 }} />
         </div>
-        <div className="page-body">
-          <div className="loading-shell">
-            <div className="skeleton-metrics">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="skeleton skeleton-metric" />
-              ))}
-            </div>
-            <div className="skeleton-lower">
-              {Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="skeleton skeleton-card" style={{ height: 180 }} />
-              ))}
-            </div>
-          </div>
-        </div>
-      </>
+      </div>
     );
   }
 
@@ -175,50 +480,34 @@ const Dashboard: React.FC = () => {
     <>
       <div className="page-header">
         <div>
-          <h2>Dashboard</h2>
-          <p>Welcome back, Patrick — here's your overview</p>
+          <h2>Overview</h2>
         </div>
-        <span className="header-date">{now}</span>
       </div>
 
       <div className="page-body">
         {/* ── Metrics Row ──────────────────────────────── */}
-        <div className="metrics-grid">
-          <MetricCard label="Scheduled Posts"  value={metrics.scheduled || 8}   icon="📅" accent="blue"   sub="This week" />
-          <MetricCard label="Drafts"           value={metrics.drafts || 4}      icon="📝" accent="amber"  sub="Awaiting review" />
-          <MetricCard label="New Comments"     value={state.comments.length || 42} icon="💬" accent="green"  sub="All platforms" />
-          <MetricCard label="Total Reach"      value="31.7K"                     icon="📊" accent="purple" sub="↑ 11.4% this week" />
-          <MetricCard label="Engagement Rate"  value="4.8%"                      icon="📈" accent="indigo" sub="↑ 0.6% vs last week" />
+        <div className="db-metrics-row">
+          <MetricCard label="Scheduled Posts" value={metrics.scheduled} icon="⊞" iconBg="#EDE9FE" iconColor="#7C3AED" />
+          <MetricCard label="Drafts"           value={metrics.drafts}   icon="✕" iconBg="#FEE2E2" iconColor="#DC2626" />
+          <MetricCard label="New Comments"     value={metrics.comments} icon="▭" iconBg="#D1FAE5" iconColor="#059669" />
+          <MetricCard label="Total Reach"      value="52.4K"            icon="⬡" iconBg="#FEF3C7" iconColor="#D97706" />
+          <Sparkline />
         </div>
 
-        {/* ── Content Sections ────────────────────────── */}
-        <div className="dashboard-lower">
-          <div className="card">
-            <div className="card-header">
-              <h3>Upcoming Posts</h3>
-              <span className="badge badge-scheduled">{metrics.scheduled} scheduled</span>
-            </div>
-            <div className="card-body">
-              <UpcomingPosts />
-            </div>
+        {/* ── Main Grid ────────────────────────────────── */}
+        <div className="db-main-grid">
+          {/* Left column */}
+          <div className="db-left-col">
+            <MiniCreatePost />
+            <AnalyticsSection />
           </div>
 
-          <div className="card">
-            <div className="card-header">
-              <h3>Pending Review</h3>
-              <span className="badge badge-draft">{metrics.drafts} drafts</span>
-            </div>
-            <div className="card-body">
-              <PendingApprovals />
-            </div>
-          </div>
-
-          <div className="card">
-            <div className="card-header">
-              <h3>Platform Reach</h3>
-            </div>
-            <div className="card-body">
-              <PlatformReach />
+          {/* Right column */}
+          <div className="db-right-col">
+            <MiniCalendar />
+            <div className="db-bottom-row">
+              <LatestComments />
+              <TopHashtagsPanel />
             </div>
           </div>
         </div>

@@ -4,21 +4,14 @@
 // scheduling, hashtag bundles, WhatsApp preview mode.
 // ============================================================
 
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { useAppContext } from './AppContext';
-import type { Platform, Post, HashtagBundle } from './types';
+import type { Platform, Post, HashtagBundle, PostTemplate } from './types';
+import { PLATFORMS, PlatformIcon } from './platforms';
 import './CreatePost.css';
 
 const PLACEHOLDER =
   'Share your latest project, thought, or update… Use emojis to add personality! 🚀✨';
-
-// ── Platform config ────────────────────────────────────────
-const PLATFORMS: { key: Platform; label: string; icon: string }[] = [
-  { key: 'instagram', label: 'Instagram', icon: '📸' },
-  { key: 'tiktok',   label: 'TikTok',    icon: '🎵' },
-  { key: 'facebook', label: 'Facebook',  icon: '👥' },
-  { key: 'whatsapp', label: 'WhatsApp',  icon: '💚' },
-];
 
 // ── WhatsApp caption preview (truncated) ──────────────────
 function getWhatsAppPreview(caption: string): string {
@@ -44,6 +37,20 @@ const CreatePost: React.FC = () => {
   const [showScheduler, setShowScheduler]   = useState(false);
 
   const fileRef = useRef<HTMLInputElement>(null);
+
+  // Load template from sessionStorage (set by Templates page)
+  useEffect(() => {
+    const raw = sessionStorage.getItem('activeTemplate');
+    if (!raw) return;
+    try {
+      const tpl: PostTemplate = JSON.parse(raw);
+      setCaption(tpl.caption);
+      setPlatforms(tpl.platforms);
+      // Find matching hashtag bundle or just use tags directly
+      sessionStorage.removeItem('activeTemplate');
+      showToast('📝 Template loaded — customise and post!');
+    } catch { /* ignore invalid JSON */ }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Derived
   const isWhatsApp  = platforms.includes('whatsapp');
@@ -227,7 +234,7 @@ const CreatePost: React.FC = () => {
               <div className="form-group">
                 <label className="form-label">Platforms</label>
                 <div className="platform-toggles">
-                  {PLATFORMS.map(({ key, label, icon }) => (
+                  {PLATFORMS.map(({ key, label }) => (
                     <button
                       key={key}
                       type="button"
@@ -235,7 +242,7 @@ const CreatePost: React.FC = () => {
                       onClick={() => togglePlatform(key)}
                       aria-pressed={platforms.includes(key)}
                     >
-                      {icon} {label}
+                      <PlatformIcon platform={key} /> {label}
                     </button>
                   ))}
                 </div>
@@ -327,7 +334,7 @@ const CreatePost: React.FC = () => {
                   <div className="preview-platforms">
                     {platforms.map((pl) => (
                       <span key={pl} className={`platform-preview-badge platform-preview-badge--${pl}`}>
-                        {PLATFORMS.find((p) => p.key === pl)?.icon} {pl}
+                        <PlatformIcon platform={pl} /> {pl}
                       </span>
                     ))}
                   </div>

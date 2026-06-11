@@ -73,7 +73,7 @@
 
 .calendar-day--today {
   border-color: var(--color-accent);
-  box-shadow: 0 0 0 3px rgba(79,110,247,0.06);
+  box-shadow: 0 0 0 3px rgba(79,110,247,0.08), var(--shadow-sm);
 }
 
 .calendar-day-header {
@@ -82,14 +82,14 @@
   align-items: center;
   gap: 6px;
   border-bottom: 1px solid var(--color-border);
-  background: var(--color-surface-alt);
+  background: linear-gradient(135deg, var(--color-surface-alt), var(--color-surface));
 }
 
 .day-label {
-  font-size: 0.66rem;
+  font-size: 0.62rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.07em;
   color: var(--color-muted);
 }
 
@@ -103,7 +103,7 @@
 
 .day-number--today {
   width: 24px; height: 24px;
-  background: var(--color-accent);
+  background: var(--gradient-accent);
   color: #fff;
   border-radius: 50%;
   display: flex;
@@ -111,23 +111,25 @@
   justify-content: center;
   font-size: 0.72rem;
   animation: today-pulse 2.5s ease-in-out infinite;
+  box-shadow: var(--shadow-accent);
 }
 
 @keyframes today-pulse {
-  0%, 100% { box-shadow: 0 2px 6px rgba(79,110,247,0.3); }
-  50%      { box-shadow: 0 4px 14px rgba(79,110,247,0.5); }
+  0%, 100% { box-shadow: 0 2px 8px rgba(79,110,247,0.35); }
+  50%      { box-shadow: 0 4px 16px rgba(79,110,247,0.55); }
 }
 
 .day-post-count {
   margin-left: auto;
   font-size: 0.6rem; font-weight: 700;
-  background: var(--color-accent);
+  background: var(--gradient-accent);
   color: #fff;
   width: 18px; height: 18px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: var(--shadow-accent);
 }
 
 .calendar-day-body {
@@ -152,17 +154,41 @@
 /* ── Post card ───────────────────────────────────────────── */
 .cal-post-card {
   border-radius: var(--radius-sm);
-  padding: 7px 9px;
+  padding: 0;
   cursor: pointer;
+  border: 1px solid rgba(59,111,232,0.15);
   border-left: 3px solid var(--color-accent);
   transition: all 0.2s var(--ease-out);
   font-size: 0.71rem;
   background: var(--color-accent-light);
+  box-shadow: var(--shadow-xs);
+  overflow: hidden;
 }
 
 .cal-post-card:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-sm);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-left-color: var(--color-accent-dark);
+}
+
+/* Tiny thumbnail at top of card */
+.cal-post-thumb {
+  width: 100%;
+  height: 54px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.cal-post-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s;
+}
+
+.cal-post-card:hover .cal-post-thumb img {
+  transform: scale(1.05);
 }
 
 .cal-post-time {
@@ -170,6 +196,7 @@
   font-weight: 700;
   color: var(--color-muted);
   margin-bottom: 2px;
+  padding: 6px 9px 0;
 }
 
 .cal-post-caption {
@@ -177,18 +204,29 @@
   color: var(--color-ink);
   line-height: 1.4;
   margin-bottom: 4px;
+  padding: 0 9px;
 }
 
 .cal-post-platforms {
   display: flex; gap: 3px; font-size: 0.68rem;
+  padding: 0 9px 7px;
 }
 
 /* ── Expanded card ───────────────────────────────────────── */
 .cal-post-expanded {
-  margin-top: 8px;
+  margin: 0 9px 8px;
   padding-top: 8px;
-  border-top: 1px solid rgba(0,0,0,0.05);
+  border-top: 1px solid rgba(0,0,0,0.07);
   animation: fade-in 0.2s var(--ease-out);
+}
+
+.cal-post-expanded-img {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  margin-bottom: 8px;
+  display: block;
 }
 
 .cal-post-full-caption {
@@ -229,14 +267,55 @@
 
 .draft-chip {
   font-size: 0.71rem;
-  padding: 5px 10px;
+  padding: 5px 12px;
   border-radius: var(--radius-sm);
-  font-weight: 500;
+  font-weight: 600;
   background: var(--color-accent-light);
   color: var(--color-accent);
-  transition: transform 0.15s, box-shadow 0.15s;
+  border: 1px solid rgba(79,110,247,0.12);
+  transition: all 0.15s var(--ease-out);
+  box-shadow: var(--shadow-xs);
 }
 .draft-chip:hover {
-  transform: translateY(-1px);
+  transform: translateY(-2px);
   box-shadow: var(--shadow-sm);
+  background: var(--color-accent);
+  color: #fff;
+  border-color: transparent;
+}
+
+/* ── Draft thumb chip (calendar drafts bar) ──────────────── */
+.draft-thumb-chip {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 10px 5px 5px;
+  border-radius: var(--radius-sm);
+  background: var(--color-accent-light);
+  color: var(--color-accent);
+  border: 1px solid rgba(59,111,232,0.12);
+  font-size: 0.71rem;
+  font-weight: 600;
+  transition: all 0.15s var(--ease-out);
+  box-shadow: var(--shadow-xs);
+  cursor: default;
+}
+.draft-thumb-chip:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.draft-thumb-chip-img {
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.draft-thumb-chip-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 130px;
 }
