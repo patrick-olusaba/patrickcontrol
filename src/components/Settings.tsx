@@ -4,6 +4,7 @@
 // ============================================================
 
 import React, { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import type { AppSettings } from '../types/types';
 import { apiGetSettings } from '../services/api';
 import { useAppContext } from '../context/AppContext';
@@ -12,12 +13,27 @@ import './Settings.css';
 
 const Settings: React.FC = () => {
   const { showToast } = useAppContext();
+  const [searchParams] = useSearchParams();
   const [settings, setSettings] = useState<AppSettings | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     apiGetSettings().then((data) => { setSettings(data); setLoading(false); });
   }, []);
+
+  // Handle OAuth callback results
+  useEffect(() => {
+    const success = searchParams.get('success');
+    const error = searchParams.get('error');
+    if (success) {
+      showToast(`✅ ${success === 'instagram' ? 'Instagram' : 'Facebook'} connected successfully!`);
+      // Refresh settings after a moment to get updated data
+      setTimeout(() => apiGetSettings().then(setSettings), 2000);
+    } else if (error) {
+      const msg = searchParams.get('msg') || '';
+      showToast(`❌ Connection failed: ${msg || error}`);
+    }
+  }, [searchParams]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSave = () => {
     showToast('✅ Settings saved');
@@ -103,9 +119,25 @@ const Settings: React.FC = () => {
                         <span className="settings-account-followers">{acct.followers.toLocaleString()} followers</span>
                       )}
                     </div>
-                    <span className={`settings-account-status ${acct.connected ? 'connected' : ''}`}>
-                      {acct.connected ? '✓ Connected' : 'Connect'}
-                    </span>
+                    {acct.platform === 'instagram' || acct.platform === 'facebook' ? (
+                      <button
+                        className={`btn btn-sm ${acct.connected ? 'btn-secondary' : 'btn-primary'}`}
+                        onClick={() => {
+                          if (acct.connected) {
+                            // Disconnect — just show toast for now
+                            window.dispatchEvent(new CustomEvent('showToast', { detail: '🔌 Disconnected ' + acct.platform }));
+                          } else {
+                            window.location.href = `/api/meta/auth?platform=${acct.platform}`;
+                          }
+                        }}
+                      >
+                        {acct.connected ? 'Disconnect' : 'Connect'}
+                      </button>
+                    ) : (
+                      <span className={`settings-account-status ${acct.connected ? 'connected' : ''}`}>
+                        {acct.connected ? '✓ Connected' : 'Offline'}
+                      </span>
+                    )}
                   </div>
                 ))}
               </div>
