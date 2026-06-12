@@ -10,14 +10,18 @@ import {
   useReducer,
   type ReactNode,
 } from 'react';
-import type { Post, Comment, Hashtag, TeamMember, HashtagBundle } from './types';
+import type { Post, Comment, Hashtag, TeamMember, HashtagBundle } from '../types/types';
 import {
-  fetchPosts,
-  fetchComments,
-  fetchHashtags,
-  fetchTeamMembers,
-  fetchHashtagBundles,
-} from './services/mockData';
+  apiGetPosts,
+  apiGetComments,
+  apiGetHashtags,
+  apiGetTeam,
+  apiGetBundles,
+  apiAddPost,
+  apiUpdatePost,
+  apiDeletePost,
+  apiReplyComment,
+} from '../services/api';
 
 // ── State shape ────────────────────────────────────────────
 interface AppState {
@@ -103,21 +107,42 @@ const AppContext = createContext<AppContextValue | null>(null);
 export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  // Load all mock data on mount
+  // Load data on mount (Firebase with mock fallback)
   useEffect(() => {
     const load = async () => {
       const [posts, comments, hashtags, teamMembers, hashtagBundles] =
         await Promise.all([
-          fetchPosts(),
-          fetchComments(),
-          fetchHashtags(),
-          fetchTeamMembers(),
-          fetchHashtagBundles(),
+          apiGetPosts(),
+          apiGetComments(),
+          apiGetHashtags(),
+          apiGetTeam(),
+          apiGetBundles(),
         ]);
       dispatch({ type: 'INIT', payload: { posts, comments, hashtags, teamMembers, hashtagBundles } });
     };
     load();
   }, []);
+
+  // Sync mutations to Firebase when configured
+  const addPost = async (post: Post) => {
+    dispatch({ type: 'ADD_POST', payload: post });
+    apiAddPost(post);
+  };
+
+  const updatePost = async (post: Post) => {
+    dispatch({ type: 'UPDATE_POST', payload: post });
+    apiUpdatePost(post);
+  };
+
+  const deletePost = async (id: string) => {
+    dispatch({ type: 'DELETE_POST', id });
+    apiDeletePost(id);
+  };
+
+  const replyComment = async (id: string) => {
+    dispatch({ type: 'REPLY_COMMENT', id });
+    apiReplyComment(id);
+  };
 
   // Auto-dismiss toast after 3 seconds
   useEffect(() => {
@@ -128,11 +153,11 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
   const value: AppContextValue = {
     state,
-    addPost:      (post)    => dispatch({ type: 'ADD_POST',      payload: post }),
-    updatePost:   (post)    => dispatch({ type: 'UPDATE_POST',   payload: post }),
-    deletePost:   (id)      => dispatch({ type: 'DELETE_POST',   id }),
-    replyComment: (id)      => dispatch({ type: 'REPLY_COMMENT', id }),
-    showToast:    (message) => dispatch({ type: 'SHOW_TOAST',    message }),
+    addPost,
+    updatePost,
+    deletePost,
+    replyComment,
+    showToast: (message) => dispatch({ type: 'SHOW_TOAST', message }),
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

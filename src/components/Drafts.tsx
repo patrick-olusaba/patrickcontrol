@@ -6,8 +6,8 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAppContext } from './AppContext';
-import type { Post } from './types';
+import { useAppContext } from '../context/AppContext';
+import type { Post } from '../types/types';
 import { PlatformIcon } from './platforms';
 import './Drafts.css';
 

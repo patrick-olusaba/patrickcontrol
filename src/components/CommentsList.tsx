@@ -4,8 +4,8 @@
 // ============================================================
 
 import React, { useState } from 'react';
-import { useAppContext } from './AppContext';
-import type { Comment } from './types';
+import { useAppContext } from '../context/AppContext';
+import type { Comment } from '../types/types';
 import { PlatformIcon } from './platforms';
 import './CommentsList.css';
 

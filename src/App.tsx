@@ -3,7 +3,7 @@
 // Top bar + white text sidebar layout
 // ============================================================
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import {
   BrowserRouter,
   Routes,
@@ -13,19 +13,19 @@ import {
   useLocation,
   useNavigate,
 } from 'react-router-dom';
-import { AppProvider, useAppContext } from './AppContext';
+import { AppProvider, useAppContext } from './context/AppContext';
 
-import Dashboard          from './Dashboard';
-import CreatePost         from './CreatePost';
-import ContentCalendar    from './ContentCalendar';
-import CommentsList       from './CommentsList';
-import HashtagSuggestions from './HashtagSuggestions';
-import TopHashtags        from './TopHashtags';
-import Drafts             from './Drafts';
-import PublishedPosts     from './PublishedPosts';
-import MediaLibrary       from './MediaLibrary';
-import Settings           from './Settings';
-import Templates          from './Templates';
+const Dashboard          = lazy(() => import('./components/Dashboard'));
+const CreatePost         = lazy(() => import('./components/CreatePost'));
+const ContentCalendar    = lazy(() => import('./components/ContentCalendar'));
+const CommentsList       = lazy(() => import('./components/CommentsList'));
+const HashtagSuggestions = lazy(() => import('./components/HashtagSuggestions'));
+const TopHashtags        = lazy(() => import('./components/TopHashtags'));
+const Drafts             = lazy(() => import('./components/Drafts'));
+const PublishedPosts     = lazy(() => import('./components/PublishedPosts'));
+const MediaLibrary       = lazy(() => import('./components/MediaLibrary'));
+const Settings           = lazy(() => import('./components/Settings'));
+const Templates          = lazy(() => import('./components/Templates'));
 
 import './styles.css';
 
@@ -60,7 +60,7 @@ const TopBar: React.FC<{ onMobileMenuToggle: () => void }> = ({ onMobileMenuTogg
 
       <a href="/" className="top-bar-logo" aria-label="Social Media Hub home">
         <div className="logo-mark" aria-hidden="true">P</div>
-        <span className="logo-text">Social Media Manager</span>
+        <span className="logo-text">PatrickControl</span>
       </a>
 
       <div className="top-bar-spacer" />
@@ -168,6 +168,18 @@ const InnerApp: React.FC = () => {
 
         <div className="main-content">
           <PageTransition>
+            <Suspense fallback={
+              <div className="page-body">
+                <div className="loading-shell">
+                  <div className="skeleton-metrics">
+                    {Array.from({ length: 4 }).map((_, i) => (
+                      <div key={i} className="skeleton skeleton-metric" />
+                    ))}
+                  </div>
+                  <div className="skeleton skeleton-card" style={{ height: 220 }} />
+                </div>
+              </div>
+            }>
             <Routes>
               <Route path="/"           element={<Dashboard />}          />
               <Route path="/create"     element={<CreatePost />}          />
@@ -182,6 +194,7 @@ const InnerApp: React.FC = () => {
               <Route path="/settings"   element={<Settings />}            />
               <Route path="*"           element={<Navigate to="/" replace />} />
             </Routes>
+            </Suspense>
           </PageTransition>
         </div>
       </div>

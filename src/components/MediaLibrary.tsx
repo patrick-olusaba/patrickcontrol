@@ -4,9 +4,9 @@
 // ============================================================
 
 import React, { useEffect, useState } from 'react';
-import { useAppContext } from './AppContext';
-import type { MediaItem } from './types';
-import { fetchMediaItems } from './services/mockData';
+import { useAppContext } from '../context/AppContext';
+import type { MediaItem } from '../types/types';
+import { apiGetMedia } from '../services/api';
 import './MediaLibrary.css';
 
 const MediaLibrary: React.FC = () => {
@@ -17,7 +17,7 @@ const MediaLibrary: React.FC = () => {
   const [selected, setSelected] = useState<MediaItem | null>(null);
 
   useEffect(() => {
-    fetchMediaItems().then((data) => { setMedia(data); setLoading(false); });
+    apiGetMedia().then((data) => { setMedia(data); setLoading(false); });
   }, []);
 
   // Also gather media from posts in state (user-uploaded)

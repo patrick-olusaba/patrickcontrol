@@ -4,8 +4,8 @@
 // ============================================================
 
 import React, { useState } from 'react';
-import { useAppContext } from './AppContext';
-import type { HashtagBundle } from './types';
+import { useAppContext } from '../context/AppContext';
+import type { HashtagBundle } from '../types/types';
 import './HashtagSuggestions.css';
 
 const HashtagSuggestions: React.FC = () => {

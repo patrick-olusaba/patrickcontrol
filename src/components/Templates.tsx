@@ -5,9 +5,9 @@
 
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAppContext } from './AppContext';
-import type { PostTemplate } from './types';
-import { fetchTemplates } from './services/mockData';
+import { useAppContext } from '../context/AppContext';
+import type { PostTemplate } from '../types/types';
+import { apiGetTemplates } from '../services/api';
 import { PlatformIcon } from './platforms';
 import './Templates.css';
 
@@ -20,7 +20,7 @@ const Templates: React.FC = () => {
   const [copied, setCopied] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchTemplates().then((data) => { setTemplates(data); setLoading(false); });
+    apiGetTemplates().then((data) => { setTemplates(data); setLoading(false); });
   }, []);
 
   const copyTemplate = (tpl: PostTemplate) => {

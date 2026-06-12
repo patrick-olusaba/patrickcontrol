@@ -10,7 +10,7 @@ import type {
   TeamMember,
   DashboardMetrics,
   HashtagBundle,
-} from '../types';
+} from '../types/types';
 
 // ── Dashboard ──────────────────────────────────────────────
 export const fetchDashboardMetrics = async (): Promise<DashboardMetrics> => ({
@@ -247,7 +247,7 @@ export const fetchTeamMembers = async (): Promise<TeamMember[]> => [
 ];
 
 // ── Published Posts ─────────────────────────────────────────
-export const fetchPublishedPosts = async (): Promise<import('../types').PublishedPost[]> => [
+export const fetchPublishedPosts = async (): Promise<import('../types/types').PublishedPost[]> => [
   {
     id: 'pub1', caption: 'Just shipped a side project! 🚀', platforms: ['instagram', 'facebook'],
     status: 'published', hashtags: ['#BuildInPublic', '#TechLife'],
@@ -287,7 +287,7 @@ export const fetchPublishedPosts = async (): Promise<import('../types').Publishe
 ];
 
 // ── Post Templates ──────────────────────────────────────────
-export const fetchTemplates = async (): Promise<import('../types').PostTemplate[]> => [
+export const fetchTemplates = async (): Promise<import('../types/types').PostTemplate[]> => [
   {
     id: 'tpl1', name: 'Product Launch', platforms: ['instagram', 'facebook', 'tiktok'],
     caption: '🚀 Excited to share what we\'ve been working on!\n\nIntroducing [name] — built to [solve problem].\n\n👉 Check it out: [link]\n\n#BuildInPublic #LaunchDay',
@@ -315,7 +315,7 @@ export const fetchTemplates = async (): Promise<import('../types').PostTemplate[
 ];
 
 // ── Media Items ─────────────────────────────────────────────
-export const fetchMediaItems = async (): Promise<import('../types').MediaItem[]> => [
+export const fetchMediaItems = async (): Promise<import('../types/types').MediaItem[]> => [
   { id: 'm1', url: '', type: 'image', postId: 'pub1', caption: 'Side project launch', createdAt: daysAgo(7) },
   { id: 'm2', url: '', type: 'image', postId: 'pub2', caption: 'Morning coffee setup', createdAt: daysAgo(5) },
   { id: 'm3', url: '', type: 'video', postId: 'pub3', caption: 'AI hot take video', createdAt: daysAgo(4) },
@@ -325,7 +325,7 @@ export const fetchMediaItems = async (): Promise<import('../types').MediaItem[]>
 ];
 
 // ── App Settings ────────────────────────────────────────────
-export const fetchSettings = async (): Promise<import('../types').AppSettings> => ({
+export const fetchSettings = async (): Promise<import('../types/types').AppSettings> => ({
   profileName: 'Patrick',
   profileBio: 'Building in public. Sharing tech tips, side projects, and morning routines.',
   profileAvatar: '',

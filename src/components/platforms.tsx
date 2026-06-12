@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { FaInstagram, FaTiktok, FaFacebook, FaWhatsapp } from 'react-icons/fa6';
-import type { Platform } from './types';
+import type { Platform } from '../types/types';
 
 export interface PlatformConfig {
   key: Platform;

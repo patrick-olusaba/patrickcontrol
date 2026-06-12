@@ -6,9 +6,9 @@
 
 import React, { useMemo, useState, useRef, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAppContext } from './AppContext';
-import type { Platform, Post, PublishedPost } from './types';
-import { fetchPublishedPosts } from './services/mockData';
+import { useAppContext } from '../context/AppContext';
+import type { Platform, Post, PublishedPost } from '../types/types';
+import { apiGetPublished } from '../services/api';
 import { LineChart, Line, BarChart, Bar, XAxis, ResponsiveContainer, Tooltip } from 'recharts';
 import { PLATFORMS, PlatformIcon } from './platforms';
 import './Dashboard.css';
@@ -401,7 +401,7 @@ const AnalyticsSection: React.FC = () => {
   const [pubPosts, setPubPosts] = useState<PublishedPost[]>([]);
 
   useEffect(() => {
-    fetchPublishedPosts().then(setPubPosts);
+    apiGetPublished().then(setPubPosts);
   }, []);
 
   const totalLikes = pubPosts.reduce((s, p) => s + p.stats.likes, 0);

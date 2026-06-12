@@ -5,8 +5,8 @@
 // ============================================================
 
 import React, { useMemo, useState } from 'react';
-import { useAppContext } from './AppContext';
-import type { Post } from './types';
+import { useAppContext } from '../context/AppContext';
+import type { Post } from '../types/types';
 import { PlatformIcon } from './platforms';
 import './ContentCalendar.css';
 

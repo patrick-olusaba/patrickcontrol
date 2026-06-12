@@ -4,8 +4,8 @@
 // ============================================================
 
 import React, { useMemo } from 'react';
-import { useAppContext } from './AppContext';
-import type { Hashtag } from './types';
+import { useAppContext } from '../context/AppContext';
+import type { Hashtag } from '../types/types';
 import './TopHashtags.css';
 
 // ── Generate trend per hashtag (deterministic from tag name) ─

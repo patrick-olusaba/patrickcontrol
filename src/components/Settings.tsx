@@ -4,9 +4,9 @@
 // ============================================================
 
 import React, { useEffect, useState } from 'react';
-import type { AppSettings } from './types';
-import { fetchSettings } from './services/mockData';
-import { useAppContext } from './AppContext';
+import type { AppSettings } from '../types/types';
+import { apiGetSettings } from '../services/api';
+import { useAppContext } from '../context/AppContext';
 import { PlatformIcon } from './platforms';
 import './Settings.css';
 
@@ -16,7 +16,7 @@ const Settings: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchSettings().then((data) => { setSettings(data); setLoading(false); });
+    apiGetSettings().then((data) => { setSettings(data); setLoading(false); });
   }, []);
 
   const handleSave = () => {

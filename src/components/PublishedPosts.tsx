@@ -4,8 +4,8 @@
 // ============================================================
 
 import React, { useEffect, useState } from 'react';
-import type { PublishedPost } from './types';
-import { fetchPublishedPosts } from './services/mockData';
+import type { PublishedPost } from '../types/types';
+import { apiGetPublished } from '../services/api';
 import { PlatformIcon } from './platforms';
 import './PublishedPosts.css';
 
@@ -20,7 +20,7 @@ const PublishedPosts: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchPublishedPosts().then((data) => {
+    apiGetPublished().then((data) => {
       setPublished(data);
       setLoading(false);
     });
